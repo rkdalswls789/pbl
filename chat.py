@@ -128,11 +128,11 @@ def main():
     st.write("개인정보처리방침 평가 어시스턴트 챗봇")
 
     gpt_rag = RagEnsemble()
-    pdf_file_path1 = '/Users/rkdal/개인정보 처리방침 작성지침(일반).pdf'
-    pdf_file_path2 = '/Users/rkdal/24년 개인정보 처리방침 평가계획.pdf'
+    pdf_file_path1 = '/Users/rkdal/작성지침.pdf'
+    #pdf_file_path2 = '/Users/rkdal/24년 개인정보 처리방침 평가계획.pdf'
 
     gpt_rag.set_pdf_retriever(pdf_file_path1)
-    gpt_rag.set_pdf_retriever(pdf_file_path2)
+    #gpt_rag.set_pdf_retriever(pdf_file_path2)
 
     user_input = st.text_input("질문을 입력하세요: ")
 
