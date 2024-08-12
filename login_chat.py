@@ -54,7 +54,9 @@ def signup_page():
         else:
             st.session_state["user_db"][new_id] = new_pw
             st.success("회원가입이 완료되었습니다!")
-            st.session_state["current_page"] = "로그인"  # 회원가입 후 로그인 페이지로 이동
+
+    if st.button("로그인 페이지로 이동"):
+        st.session_state["current_page"] = "로그인"  # 사용자가 클릭 시 로그인 페이지로 이동
 
 # 아이디/비밀번호 찾기 페이지 (간단한 형태로 구현)
 def recover_account_page():
