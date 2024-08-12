@@ -86,7 +86,7 @@ def chat_page():
             )
             self.embeddings = HuggingFaceEmbeddings(
                 model_name='BAAI/bge-m3',
-                model_kwargs={'device':'cuda'},
+                model_kwargs={'device':'cpu'},
                 encode_kwargs={'normalize_embeddings':True}
             )
             self.retriever = None
