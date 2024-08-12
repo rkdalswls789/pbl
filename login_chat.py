@@ -73,7 +73,7 @@ def recover_account_page():
 
 # 챗봇 페이지
 def chat_page():
-    st.title("PPAP 챗봇")
+    st.title("PPAP")
     st.write("개인정보처리방침 평가 어시스턴트 챗봇")
 
     # RagEnsemble 클래스 정의 및 초기화
@@ -81,12 +81,12 @@ def chat_page():
         def __init__(self):
             self.model = ChatOpenAI(model="gpt-4-turbo", temperature=0)
             self.text_splitter = RecursiveCharacterTextSplitter(
-                chunk_size=1024,
-                chunk_overlap=100
+                chunk_size=512,
+                chunk_overlap=50
             )
             self.embeddings = HuggingFaceEmbeddings(
                 model_name='BAAI/bge-m3',
-                model_kwargs={'device':'cpu'},
+                model_kwargs={'device':'cuda'},
                 encode_kwargs={'normalize_embeddings':True}
             )
             self.retriever = None
