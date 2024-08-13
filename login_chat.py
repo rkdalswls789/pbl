@@ -24,11 +24,10 @@ def check_login():
     if "logged_in" not in st.session_state:
         st.session_state["logged_in"] = False
 
-# 로그인 페이지
-def PPAP_login_page():
-    st.title("PPAP 로그인")
-    id_input = st.text_input("아이디")
-    pw_input = st.text_input("비밀번호", type="password")
+# 메인 페이지
+def main_page():
+    st.title("PPAP 서비스")
+
     ppap_login_html = '''
     <style>
         .ppap-login-btn {
@@ -48,15 +47,24 @@ def PPAP_login_page():
     <div class="ppap-login-btn">PPAP 로그인</div>
     '''
     st.markdown(ppap_login_html, unsafe_allow_html=True)
-    
+
     # 아이디, 비밀번호 찾기, 회원가입 링크
     st.markdown('''
     <div style="text-align: center; margin-top: 20px;">
-        <a href="#" style="margin-right: 15px;">아이디 찾기</a> |
-        <a href="#" style="margin-left: 15px; margin-right: 15px;">비밀번호 찾기</a> |
-        <a href="#" style="margin-left: 15px;">회원가입</a>
+        <a href="#" onclick="window.location.href='/아이디_찾기'">아이디 찾기</a> |
+        <a href="#" onclick="window.location.href='/비밀번호_찾기'">비밀번호 찾기</a> |
+        <a href="#" onclick="window.location.href='/회원가입'">회원가입</a>
     </div>
     ''', unsafe_allow_html=True)
+
+    if st.button("PPAP 로그인"):
+        st.session_state["current_page"] = "로그인"
+
+# 로그인 페이지
+def ppap_login_page():
+    st.title("PPAP 로그인")
+    id_input = st.text_input("아이디")
+    pw_input = st.text_input("비밀번호", type="password")
 
     if st.button("로그인"):
         if id_input in st.session_state["user_db"] and st.session_state["user_db"][id_input] == pw_input:
@@ -65,12 +73,6 @@ def PPAP_login_page():
             st.success("로그인 성공!")
         else:
             st.error("아이디 또는 비밀번호가 잘못되었습니다.")
-
-    if st.button("회원가입"):
-        st.session_state["current_page"] = "회원가입"
-
-    if st.button("아이디/비밀번호 찾기"):
-        st.session_state["current_page"] = "아이디/비밀번호 찾기"
 
 # 회원가입 페이지
 def signup_page():
