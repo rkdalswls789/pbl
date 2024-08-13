@@ -193,8 +193,54 @@ def chat_page():
                 self.prompt | self.model | StrOutputParser()
             )        
         
-        def ask(self
+        def ask(self, query: str):
+            if not self.rag_chain:
+                return "평가할 PDF 파일을 먼저 등록해주세요"
+            result = self.retriever.get_relevant_documents(query)
+            reranked_docs = self.rerank(query, result) # 문서 재정렬
+            formatted_docs = self.format_docs(reranked_docs) # 문서 포맷팅
+            # 답변 생성
+            response = self.rag_chain.invoke({"context": formatted_docs, "question": query})
+            return response
+                
+        def clear(self):
+            # 설정 초기화
+            self.retriever = None
+            self.rag_chain = None
 
+    # RagEnsemble 클래스 인스턴스화 및 사용
+    gpt_rag = RagEnsemble()
+    pdf_file_path1 = 'C:\\Users\\rkdal\\작성지침.pdf'
+    #pdf_file_path2 = '/Users/rkdal/24년 개인정보 처리방침 평가계획.pdf'
+
+    gpt_rag.set_pdf_retriever(pdf_file_path1)
+    #gpt_rag.set_pdf_retriever(pdf_file_path2)
+
+    user_input = st.text_input("질문을 입력하세요: ")
+
+    if st.button("질문하기"):
+        if user_input:
+            answer = gpt_rag.ask(user_input)
+            st.write("답변: ", answer)
+        else:
+            st.write("질문을 입력하세요.")
+
+# Main 함수에서 로그인 상태에 따라 페이지를 전환
+def main():
+    check_login()
+
+    if "current_page" not in st.session_state:
+        st.session_state["current_page"] = "로그인"
+
+    if not st.session_state["logged_in"]:
+        if st.session_state["current_page"] == "로그인":
+            PPAP_login_page()
+        elif st.session_state["current_page"] == "회원가입":
+            signup_page()
+        elif st.session_state["current_page"] == "아이디/비밀번호 찾기":
+            recover_account_page()
+    else:
+        chat_page()
 
 if __name__ == "__main__":
     main()
