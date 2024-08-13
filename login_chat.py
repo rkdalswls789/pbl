@@ -34,7 +34,7 @@ def main_page():
             display: block;
             width: 250px;
             height: 50px;
-            background-color: #03C75A;
+            background-color: #4169E1;
             color: white;
             text-align: center;
             line-height: 50px;
@@ -218,31 +218,39 @@ def chat_page():
     gpt_rag.set_pdf_retriever(pdf_file_path1)
     #gpt_rag.set_pdf_retriever(pdf_file_path2)
 
-    user_input = st.text_input("질문을 입력하세요: ")
+    # 챗봇 UI 구현
+    question = st.text_input('질문 입력')
+    submit = st.button('제출')
+    if submit:
+        answer = gpt_rag.ask(question)
+        st.write('답변:', answer)
 
-    if st.button("질문하기"):
-        if user_input:
-            answer = gpt_rag.ask(user_input)
-            st.write("답변: ", answer)
-        else:
-            st.write("질문을 입력하세요.")
+    if st.button('다른 PDF 파일로 설정'):
+        gpt_rag.clear()
 
-# Main 함수에서 로그인 상태에 따라 페이지를 전환
-def main():
+# 메인 실행 함수
+def run_app():
     check_login()
-
+    
+    # current_page가 세션 상태에 없으면 메인 페이지로 설정
     if "current_page" not in st.session_state:
-        st.session_state["current_page"] = "로그인"
+        st.session_state["current_page"] = "메인"
 
-    if not st.session_state["logged_in"]:
-        if st.session_state["current_page"] == "로그인":
-            PPAP_login_page()
-        elif st.session_state["current_page"] == "회원가입":
-            signup_page()
-        elif st.session_state["current_page"] == "아이디/비밀번호 찾기":
-            recover_account_page()
-    else:
-        chat_page()
+    # current_page에 따라 다른 페이지 호출
+    if st.session_state["current_page"] == "메인":
+        main_page()
+    elif st.session_state["current_page"] == "로그인":
+        ppap_login_page()
+    elif st.session_state["current_page"] == "회원가입":
+        signup_page()
+    elif st.session_state["current_page"] == "아이디/비밀번호 찾기":
+        recover_account_page()
+    elif st.session_state["current_page"] == "챗봇":
+        if st.session_state["logged_in"]:
+            chat_page()
+        else:
+            st.warning("로그인이 필요합니다.")
+            st.session_state["current_page"] = "로그인"
 
 if __name__ == "__main__":
-    main()
+    run_app()
