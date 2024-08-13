@@ -42,23 +42,21 @@ def main_page():
             font-weight: bold;
             font-size: 16px;
             margin: 0 auto;
+            cursor: pointer;
         }
     </style>
-    <div class="ppap-login-btn">PPAP 로그인</div>
+    <div class="ppap-login-btn" onclick="location.href='/로그인'">PPAP 로그인</div>
     '''
     st.markdown(ppap_login_html, unsafe_allow_html=True)
 
     # 아이디, 비밀번호 찾기, 회원가입 링크
     st.markdown('''
     <div style="text-align: center; margin-top: 20px;">
-        <a href="#" onclick="window.location.href='/아이디_찾기'">아이디 찾기</a> |
-        <a href="#" onclick="window.location.href='/비밀번호_찾기'">비밀번호 찾기</a> |
-        <a href="#" onclick="window.location.href='/회원가입'">회원가입</a>
+        <a href="#" onclick="location.href='/아이디_찾기'">아이디 찾기</a> |
+        <a href="#" onclick="location.href='/비밀번호_찾기'">비밀번호 찾기</a> |
+        <a href="#" onclick="location.href='/회원가입'">회원가입</a>
     </div>
     ''', unsafe_allow_html=True)
-
-    if st.button("PPAP 로그인"):
-        st.session_state["current_page"] = "로그인"
 
 # 로그인 페이지
 def ppap_login_page():
@@ -73,6 +71,12 @@ def ppap_login_page():
             st.success("로그인 성공!")
         else:
             st.error("아이디 또는 비밀번호가 잘못되었습니다.")
+
+    if st.button("회원가입 페이지로 이동"):
+        st.session_state["current_page"] = "회원가입"
+
+    if st.button("아이디/비밀번호 찾기 페이지로 이동"):
+        st.session_state["current_page"] = "아이디/비밀번호 찾기"
 
 # 회원가입 페이지
 def signup_page():
@@ -91,7 +95,7 @@ def signup_page():
             st.success("회원가입이 완료되었습니다!")
 
     if st.button("로그인 페이지로 이동"):
-        st.session_state["current_page"] = "로그인"  # 사용자가 클릭 시 로그인 페이지로 이동
+        st.session_state["current_page"] = "로그인"
 
 # 아이디/비밀번호 찾기 페이지 (간단한 형태로 구현)
 def recover_account_page():
