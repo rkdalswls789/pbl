@@ -3,8 +3,7 @@ from dotenv import load_dotenv
 import torch
 import streamlit as st
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.document_loaders import WebBaseLoader
-from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import WebBaseLoader,PyPDFLoader
 from langchain_community.vectorstores import FAISS
 from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
@@ -26,10 +25,38 @@ def check_login():
         st.session_state["logged_in"] = False
 
 # 로그인 페이지
-def login_page():
-    st.title("로그인")
+def PPAP_login_page():
+    st.title("PPAP 로그인")
     id_input = st.text_input("아이디")
     pw_input = st.text_input("비밀번호", type="password")
+    login_html = '''
+    <style>
+        .ppap-login-btn {
+            display: block;
+            width: 250px;
+            height: 50px;
+            background-color: #03C75A;
+            color: white;
+            text-align: center;
+            line-height: 50px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 16px;
+            margin: 0 auto;
+        }
+    </style>
+    <div class="ppap-login-btn">PPAP 로그인</div>
+    '''
+    st.markdown(PPAP_login_html, unsafe_allow_html=True)
+    
+    # 아이디, 비밀번호 찾기, 회원가입 링크
+    st.markdown('''
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="#" style="margin-right: 15px;">아이디 찾기</a> |
+        <a href="#" style="margin-left: 15px; margin-right: 15px;">비밀번호 찾기</a> |
+        <a href="#" style="margin-left: 15px;">회원가입</a>
+    </div>
+    ''', unsafe_allow_html=True)
 
     if st.button("로그인"):
         if id_input in st.session_state["user_db"] and st.session_state["user_db"][id_input] == pw_input:
