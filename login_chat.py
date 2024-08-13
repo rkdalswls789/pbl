@@ -45,19 +45,18 @@ def main_page():
             cursor: pointer;
         }
     </style>
-    <div class="ppap-login-btn" onclick="location.href='/로그인'">PPAP 로그인</div>
+    <div class="ppap-login-btn" onclick="window.location.href='?page=login'">PPAP 로그인</div>
     '''
     st.markdown(ppap_login_html, unsafe_allow_html=True)
 
-    # 아이디, 비밀번호 찾기, 회원가입 링크
+     # 아이디, 비밀번호 찾기, 회원가입 링크
     st.markdown('''
     <div style="text-align: center; margin-top: 20px;">
-        <a href="#" onclick="location.href='/아이디_찾기'">아이디 찾기</a> |
-        <a href="#" onclick="location.href='/비밀번호_찾기'">비밀번호 찾기</a> |
-        <a href="#" onclick="location.href='/회원가입'">회원가입</a>
+        <a href="#" onclick="window.location.href='?page=forgot_id'">아이디 찾기</a> |
+        <a href="#" onclick="window.location.href='?page=forgot_password'">비밀번호 찾기</a> |
+        <a href="#" onclick="window.location.href='?page=signup'">회원가입</a>
     </div>
     ''', unsafe_allow_html=True)
-
 # 로그인 페이지
 def ppap_login_page():
     st.title("PPAP 로그인")
@@ -234,10 +233,17 @@ def chat_page():
 
 # 메인 실행 함수
 def run_app():
-    check_login()
-    
-    # current_page가 세션 상태에 없으면 메인 페이지로 설정
-    if "current_page" not in st.session_state:
+    # 페이지 파라미터를 통해 세션 상태를 업데이트
+    page = st.experimental_get_query_params().get('page', ['main'])[0]
+    if page == 'login':
+        st.session_state["current_page"] = "로그인"
+    elif page == 'signup':
+        st.session_state["current_page"] = "회원가입"
+    elif page == 'forgot_id':
+        st.session_state["current_page"] = "아이디/비밀번호 찾기"
+    elif page == 'forgot_password':
+        st.session_state["current_page"] = "아이디/비밀번호 찾기"
+    else:
         st.session_state["current_page"] = "메인"
 
     # current_page에 따라 다른 페이지 호출
@@ -257,4 +263,12 @@ def run_app():
             st.session_state["current_page"] = "로그인"
 
 if __name__ == "__main__":
+    # 세션 상태 초기화
+    if "current_page" not in st.session_state:
+        st.session_state["current_page"] = "메인"
+    if "user_db" not in st.session_state:
+        st.session_state["user_db"] = {}
+    if "logged_in" not in st.session_state:
+        st.session_state["logged_in"] = False
+
     run_app()
