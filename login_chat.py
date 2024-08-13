@@ -3,14 +3,14 @@ from dotenv import load_dotenv
 import torch
 import streamlit as st
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import WebBaseLoader, PyPDFLoader
-from langchain_community.vectorstores import FAISS
+from langchain.document_loaders import PyPDFLoader, WebBaseLoader
+from langchain.vectorstores import FAISS
 from langchain.schema.output_parser import StrOutputParser
 from langchain.schema.runnable import RunnablePassthrough
 from langchain.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain.retrievers import BM25Retriever, EnsembleRetriever
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain.embeddings import HuggingFaceEmbeddings
 
 # API 키 정보 로드
 load_dotenv()
@@ -24,41 +24,8 @@ def check_login():
     if "logged_in" not in st.session_state:
         st.session_state["logged_in"] = False
 
-# 메인 페이지
-def main_page():
-    st.title("PPAP 서비스")
-
-    ppap_login_html = '''
-    <style>
-        .ppap-login-btn {
-            display: block;
-            width: 250px;
-            height: 50px;
-            background-color: #4169E1;
-            color: white;
-            text-align: center;
-            line-height: 50px;
-            border-radius: 5px;
-            font-weight: bold;
-            font-size: 16px;
-            margin: 0 auto;
-            cursor: pointer;
-        }
-    </style>
-    <div class="ppap-login-btn" onclick="window.location.href='?page=login'">PPAP 로그인</div>
-    '''
-    st.markdown(ppap_login_html, unsafe_allow_html=True)
-
-     # 아이디, 비밀번호 찾기, 회원가입 링크
-    st.markdown('''
-    <div style="text-align: center; margin-top: 20px;">
-        <a href="#" onclick="window.location.href='?page=forgot_id'">아이디 찾기</a> |
-        <a href="#" onclick="window.location.href='?page=forgot_password'">비밀번호 찾기</a> |
-        <a href="#" onclick="window.location.href='?page=signup'">회원가입</a>
-    </div>
-    ''', unsafe_allow_html=True)
 # 로그인 페이지
-def ppap_login_page():
+def login_page():
     st.title("PPAP 로그인")
     id_input = st.text_input("아이디")
     pw_input = st.text_input("비밀번호", type="password")
@@ -71,10 +38,10 @@ def ppap_login_page():
         else:
             st.error("아이디 또는 비밀번호가 잘못되었습니다.")
 
-    if st.button("회원가입 페이지로 이동"):
+    if st.button("회원가입"):
         st.session_state["current_page"] = "회원가입"
 
-    if st.button("아이디/비밀번호 찾기 페이지로 이동"):
+    if st.button("아이디/비밀번호 찾기"):
         st.session_state["current_page"] = "아이디/비밀번호 찾기"
 
 # 회원가입 페이지
@@ -94,7 +61,7 @@ def signup_page():
             st.success("회원가입이 완료되었습니다!")
 
     if st.button("로그인 페이지로 이동"):
-        st.session_state["current_page"] = "로그인"
+        st.session_state["current_page"] = "로그인"  # 사용자가 클릭 시 로그인 페이지로 이동
 
 # 아이디/비밀번호 찾기 페이지 (간단한 형태로 구현)
 def recover_account_page():
@@ -221,54 +188,31 @@ def chat_page():
     gpt_rag.set_pdf_retriever(pdf_file_path1)
     #gpt_rag.set_pdf_retriever(pdf_file_path2)
 
-    # 챗봇 UI 구현
-    question = st.text_input('질문 입력')
-    submit = st.button('제출')
-    if submit:
-        answer = gpt_rag.ask(question)
-        st.write('답변:', answer)
+    user_input = st.text_input("질문을 입력하세요: ")
 
-    if st.button('다른 PDF 파일로 설정'):
-        gpt_rag.clear()
-
-# 메인 실행 함수
-def run_app():
-    # 페이지 파라미터를 통해 세션 상태를 업데이트
-    page = st.experimental_get_query_params().get('page', ['main'])[0]
-    if page == 'login':
-        st.session_state["current_page"] = "로그인"
-    elif page == 'signup':
-        st.session_state["current_page"] = "회원가입"
-    elif page == 'forgot_id':
-        st.session_state["current_page"] = "아이디/비밀번호 찾기"
-    elif page == 'forgot_password':
-        st.session_state["current_page"] = "아이디/비밀번호 찾기"
-    else:
-        st.session_state["current_page"] = "메인"
-
-    # current_page에 따라 다른 페이지 호출
-    if st.session_state["current_page"] == "메인":
-        main_page()
-    elif st.session_state["current_page"] == "로그인":
-        ppap_login_page()
-    elif st.session_state["current_page"] == "회원가입":
-        signup_page()
-    elif st.session_state["current_page"] == "아이디/비밀번호 찾기":
-        recover_account_page()
-    elif st.session_state["current_page"] == "챗봇":
-        if st.session_state["logged_in"]:
-            chat_page()
+    if st.button("질문하기"):
+        if user_input:
+            answer = gpt_rag.ask(user_input)
+            st.write("답변: ", answer)
         else:
-            st.warning("로그인이 필요합니다.")
-            st.session_state["current_page"] = "로그인"
+            st.write("질문을 입력하세요.")
+
+# Main 함수에서 로그인 상태에 따라 페이지를 전환
+def main():
+    check_login()
+
+    if "current_page" not in st.session_state:
+        st.session_state["current_page"] = "로그인"
+
+    if not st.session_state["logged_in"]:
+        if st.session_state["current_page"] == "로그인":
+            login_page()
+        elif st.session_state["current_page"] == "회원가입":
+            signup_page()
+        elif st.session_state["current_page"] == "아이디/비밀번호 찾기":
+            recover_account_page()
+    else:
+        chat_page()
 
 if __name__ == "__main__":
-    # 세션 상태 초기화
-    if "current_page" not in st.session_state:
-        st.session_state["current_page"] = "메인"
-    if "user_db" not in st.session_state:
-        st.session_state["user_db"] = {}
-    if "logged_in" not in st.session_state:
-        st.session_state["logged_in"] = False
-
-    run_app()
+    main()
